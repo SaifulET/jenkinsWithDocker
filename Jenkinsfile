@@ -37,15 +37,26 @@ pipeline {
         stage('Test Endpoints') {
             steps {
                 script {
-                    // হোস্টের নেটওয়ার্কে সিবলিং কন্টেইনার রান করা
-                    sh "docker run -d --name ${CONTAINER_NAME} --network host ${IMAGE_NAME}:${IMAGE_TAG}"
+                    // হোস্টের পোর্টে ম্যাপ করে কন্টেইনার রান করা
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 5000:5000 ${IMAGE_NAME}:${IMAGE_TAG}"
                     
-                    // সার্ভার রেডি হওয়ার জন্য ৩ সেকেন্ড অপেক্ষা
-                    sleep 3
+                    // সার্ভার রেডি হওয়ার জন্য ৫ সেকেন্ড অপেক্ষা
+                    sleep 5
 
-                    // API Endpoints টেস্ট করা
-                    sh "curl -f http://localhost:5000/health"
-                    sh "curl -f http://localhost:5000/"
+                    // host.docker.internal দিয়ে হোস্টে রিকোয়েস্ট পাঠানো
+                    // (লিনাক্স/উইন্ডোজ/ম্যাক সব প্ল্যাটফর্মে কাজ করার জন্য fallback সহ)
+                    sh '''
+                    TARGET_HOST="localhost"
+                    if ! curl -s -f http://localhost:5000/health > /dev/null 2>&1; then
+                        TARGET_HOST="host.docker.internal"
+                    fi
+
+                    echo "Testing against: http://${TARGET_HOST}:5000"
+                    curl -f http://${TARGET_HOST}:5000/health
+                    echo ""
+                    curl -f http://${TARGET_HOST}:5000/
+                    echo ""
+                    '''
                 }
             }
         }
