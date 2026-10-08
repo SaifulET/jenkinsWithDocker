@@ -63,11 +63,11 @@ pipeline {
     }
 
     post {
-        // always {
-        //     // হোস্ট মেশিন থেকে টেস্ট কন্টেইনার ও ইমেজ ক্লিনআপ
-        //     sh "docker rm -f ${CONTAINER_NAME} || true"
-        //     sh "docker rmi -f ${IMAGE_NAME}:${IMAGE_TAG} || true"
-        // }
+        always {
+            // হোস্ট মেশিন থেকে টেস্ট কন্টেইনার ও ইমেজ ক্লিনআপ
+            sh "docker rm -f ${CONTAINER_NAME} || true"
+            sh "docker rmi -f ${IMAGE_NAME}:${IMAGE_TAG} || true"
+        }
         success {
             echo "CI/CD Pipeline executed successfully!"
         }
