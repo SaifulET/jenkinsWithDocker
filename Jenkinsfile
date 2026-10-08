@@ -68,6 +68,7 @@ pipeline {
             sh "docker rm -f ${CONTAINER_NAME} || true"
             sh "docker rmi -f ${IMAGE_NAME}:${IMAGE_TAG} || true"
         }
+        
         success {
             echo "CI/CD Pipeline executed successfully!"
         }
